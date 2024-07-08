@@ -1,10 +1,6 @@
 import os
 import datetime
-
-import pandas as pd
-from gql import gql, Client
-from gql.transport.aiohttp import AIOHTTPTransport
-
+import requests
 
 
 class TibberClient:
@@ -12,18 +8,18 @@ class TibberClient:
 
     def __init__(self, token):
         # Select your transport with a defined url endpoint
-        transport = AIOHTTPTransport(
-            url=self.TIBBER_API_URL,
-            headers={"Authorization": f"Bearer {token}"},
-        )
+        url = 'https://api.tibber.com/v1-beta/gql'
 
-        # Create a GraphQL client using the defined transport
-        self.client = Client(transport=transport, fetch_schema_from_transport=True)
-
+        # Define the headers, if necessary
+        self.headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token  # if authentication is required
+        }
 
     def fetch_from_api(self):
-        query = gql(
-            """
+        
+        # Define the GraphQL query or mutation
+        query = """
              {
                 viewer {
                     homes {
@@ -46,12 +42,20 @@ class TibberClient:
                 }
             }
         """
-        )
-        result = self.client.execute(query)
-        data = result["viewer"]["homes"][0]["currentSubscription"]["priceInfo"]
-        df = self.wrangle_tibber_data(data)
-        if datetime.datetime.now().hour >= 13 and df.shape[0] == 48:
-            if not os.path.exists("data"):
-                os.makedirs("data")
-            df.to_csv(self.get_current_file_path(), index=False)
-        return df
+
+        # Define the payload
+        payload = {
+            'query': query
+        }
+
+        # Send the request
+        response = requests.post(self.TIBBER_API_URL, headers=self.headers, json=payload)
+        
+        # Check for errors
+        if response.status_code == 200:
+            data = response.json()
+            return data
+        else:
+            print(f"Request failed with status code {response.status_code}")
+            print(response.text)
+            raise ValueError()
