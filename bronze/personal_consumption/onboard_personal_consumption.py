@@ -26,6 +26,11 @@ client = TibberClient(token)
 # COMMAND ----------
 
 result = client.fetch_from_api()
+# data = result['data']['viewer']['homes']
+# if len(data) == 1:
+#     data = data[0]
+# else:
+#     ValueError('Only expecting a single home')
 
 # COMMAND ----------
 
@@ -33,7 +38,7 @@ now = datetime.datetime.now()
 
 # COMMAND ----------
 
-personal_consumption_reservoir = '/reservior/personal_consumption'
+personal_consumption_reservoir = '/reservoir/personal_consumption'
 file_name = f'pc_tibber_{now}.json'
 file_path = '/'.join([personal_consumption_reservoir, file_name])
 print(f"{file_path=}")
@@ -41,3 +46,15 @@ print(f"{file_path=}")
 # COMMAND ----------
 
 dbutils.fs.put(file_path, json.dumps(result))
+
+# COMMAND ----------
+
+personal_consumption_reservoir
+
+# COMMAND ----------
+
+dbutils.fs.ls('/reservoir/personal_consumption')
+
+# COMMAND ----------
+
+
