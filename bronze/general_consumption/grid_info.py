@@ -4,7 +4,7 @@ import requests
 
 
 class GridInfoClient:
-    bnetz_url = "https://smard.api.bund.dev"
+    bnetz_url = "https://smard.api.proxy.bund.dev/app"
 
     headers = {
             'Content-Type': 'application/json',
@@ -12,16 +12,6 @@ class GridInfoClient:
 
     def __init__(self):
         pass
-
-    def get_indices(self, filter, region, resolution):
-        endpoint = f"/chart_data/{filter}/{region}/index_{resolution}.json"
-        return _fetch_from_api(endpoint)
-    
-
-    def get_indices(self, filter, region, resolution, timestamp):
-        endpoint = f"/chart_data/{filter}/{region}/{filter}_{region}_{resolution}_{timestamp}.json"
-        return _fetch_from_api(endpoint)
-        
 
     def _fetch_from_api(self, endpoint):
         
@@ -37,3 +27,13 @@ class GridInfoClient:
             print(f"Request failed with status code {response.status_code}")
             print(response.text)
             raise ValueError()
+    
+    def get_indices(self, filter, region, resolution):
+        endpoint = f"/chart_data/{filter}/{region}/index_{resolution}.json"
+        return self._fetch_from_api(endpoint)
+    
+
+    def get_data(self, filter, region, resolution, timestamp):
+        endpoint = f"/chart_data/{filter}/{region}/{filter}_{region}_{resolution}_{timestamp}.json"
+        return self._fetch_from_api(endpoint)
+        
