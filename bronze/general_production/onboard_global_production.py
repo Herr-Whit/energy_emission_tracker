@@ -95,6 +95,11 @@ reservoir_path = '/reservoir/global_production/'
 
 # COMMAND ----------
 
+if True:
+    dbutils.fs.rm(reservoir_path, True)
+
+# COMMAND ----------
+
 dbutils.fs.mkdirs(reservoir_path)
 
 # COMMAND ----------
@@ -145,7 +150,7 @@ data
 
 import json
 json_payload = json.dumps(data)
-file_name = f"{fltr}_{region}_{resolution}_{timestamp}.json"
+file_name = f"{fltr}_{region}_{resolution}_{timestamp}_.json"
 dbutils.fs.put(reservoir_path + file_name, json_payload, True)
 
 # COMMAND ----------
