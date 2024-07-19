@@ -91,7 +91,7 @@ from grid_info import GridInfoClient
 
 # COMMAND ----------
 
-reservoir_path = '/reservoir/global_production/'
+reservoir_path = '/reservoir/general_production/'
 
 # COMMAND ----------
 
@@ -143,7 +143,7 @@ print(','.join([datetime.datetime.utcfromtimestamp(int(t / 1000)).isoformat() fo
 
 # COMMAND ----------
 
-data = client.get_data(fltr, region, resolution, timestamps[0])
+data = client.get_data(fltr, region, resolution, timestamps[2])
 data
 
 # COMMAND ----------
@@ -151,7 +151,9 @@ data
 import json
 json_payload = json.dumps(data)
 file_name = f"{fltr}_{region}_{resolution}_{timestamp}_.json"
-dbutils.fs.put(reservoir_path + file_name, json_payload, True)
+file_path = reservoir_path + file_name
+print(file_path)
+dbutils.fs.put(file_path, json_payload, True)
 
 # COMMAND ----------
 
