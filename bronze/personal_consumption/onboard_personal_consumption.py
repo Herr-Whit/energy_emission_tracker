@@ -1,8 +1,4 @@
 # Databricks notebook source
-# MAGIC %pip install requests
-
-# COMMAND ----------
-
 import pyspark
 import pyspark.sql.functions as F
 
@@ -19,9 +15,7 @@ personal_consumption_reservoir = '/reservoir/personal_consumption'
 
 # COMMAND ----------
 
-with open('/Workspace/Repos/anton.whittaker@gmail.com/energy_emission_tracker/bronze/personal_consumption/secrets.json', 'r') as f:
-  token = json.load(f)['tibber_token']
-
+token = dbutils.secrets.get('defvault', 'tibber-token')
 
 # COMMAND ----------
 
