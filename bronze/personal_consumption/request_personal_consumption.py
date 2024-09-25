@@ -23,7 +23,7 @@ client = TibberClient(token, debug=True)
 
 # COMMAND ----------
 
-result = client.fetch_from_api(first=100)
+result = client.fetch_from_api(first=100000)
 data = result['data']['viewer']['homes'][0]
 
 # COMMAND ----------
