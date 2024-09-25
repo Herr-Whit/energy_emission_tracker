@@ -30,35 +30,14 @@ schema = T.StructType([
 # COMMAND ----------
 
 df = spark.readStream.table(bronze_table)
-
-
-# COMMAND ----------
-
 # df = spark.read.table(bronze_table)
-# # 
 
-# COMMAND ----------
-
-# df_static = (spark.read.table(bronze_table))
-# display(df_static.select('ingest_time').distinct( ))
-# from delta import DeltaTable
-# dt = DeltaTable.forName(spark, bronze_table)
-# display(dt.detail())
-# display(dt.history())
-
-# COMMAND ----------
-
-# display(df)
 
 # COMMAND ----------
 
 df = df.withColumn('consumption', F.from_json(F.col('consumption'), schema))
 df = df.withColumn('nodes', F.explode(F.col('consumption.nodes')))
 
-
-# COMMAND ----------
-
-# display(df)
 
 # COMMAND ----------
 
@@ -75,17 +54,9 @@ df = (
 
 # COMMAND ----------
 
-# display(df)
-
-# COMMAND ----------
-
 df = df.withColumn('day', F.dayofmonth(F.col('from')))
 df = df.withColumn('month', F.month(F.col('from')))
 df = df.withColumn('year', F.year(F.col('from')))
-
-# COMMAND ----------
-
-# display(df)
 
 # COMMAND ----------
 
@@ -94,25 +65,18 @@ def write_to_silver(df, batch_id):
     if ~df.isEmpty():
         try:
             df = df.withColumn('batch_id', F.lit(batch_id))
-            dt = DeltaTable.forName(spark, silver_table)
-            dt.merge(df, F.expr("dt.from == df.from and dt.to == df.to")).whenNotMatchedInsertAll()
+            dt = DeltaTable.forName(spark, silver_table).alias('dt')
+            dt.merge(df.alias('df'), F.expr("dt.from == df.from and dt.to == df.to")).whenNotMatchedInsertAll().execute()
         except pyspark.sql.utils.AnalysisException:
             print("Table may not exist. Trying to create table...")
-            df.write.saveAsTable(silver_table)
+            df.write.format('delta').saveAsTable(silver_table)
     else:
         print("No data to write")
 
 # COMMAND ----------
 
-# write_to_silver(df, -1)
-
-# COMMAND ----------
-
-# display(df)
-
-# COMMAND ----------
-
-df.writeStream.option("checkpointLocation", "/checkpoints/silver/pc_to_silver").outputMode('append').toTable(silver_table).start()#foreachBatch(write_to_silver).trigger(processingTime='10 seconds').start()
+# df.writeStream.option("checkpointLocation", "/checkpoints/silver/pc_to_silver").outputMode('append').toTable(silver_table).start()#foreachBatch(write_to_silver).trigger(processingTime='10 seconds').start()
+df.writeStream.option("checkpointLocation", "/checkpoints/silver/pc_to_silver").foreachBatch(write_to_silver).trigger(processingTime='10 seconds').start()
 
 # COMMAND ----------
 

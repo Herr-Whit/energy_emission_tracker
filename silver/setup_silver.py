@@ -1,7 +1,7 @@
 # Databricks notebook source
 spark.sql(
     """
-    CREATE DATABASE unity.silver
+    CREATE DATABASE IF NOT EXISTS unity.silver
     """
 )
 

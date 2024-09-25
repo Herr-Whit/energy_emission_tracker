@@ -38,10 +38,6 @@ stream = spark.readStream.format("cloudFiles").option("cloudFiles.format", "json
 
 # COMMAND ----------
 
-# stream = spark.read.format("json").schema(schema).load(personal_consumption_reservoir)
-
-# COMMAND ----------
-
 stream = stream.withColumn('ingest_time', F.current_timestamp())
 
 # COMMAND ----------
