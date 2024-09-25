@@ -21,30 +21,20 @@ schema_location = "dbfs:/checkpoints/schema_location/"
 
 # COMMAND ----------
 
-if True:
-    spark.sql(
+spark.sql(
     f"""
-    DROP TABLE {table}
-    """
+    CREATE TABLE IF NOT EXISTS {table} (
+    meta_data STRING,
+    series VAR,
+    filter_code STRING,
+    region STRING,
+    resolution STRING,
+    request_timestamp STRING,
+    _rescued_data STRING,
+    ingest_time TIMESTAMP
     )
-    dbutils.fs.rm(checkpoint_location, True)
-
-# COMMAND ----------
-
-# spark.sql(
-#     f"""
-#     CREATE TABLE IF NOT EXISTS {table} (
-#     meta_data STRING,
-#     series VAR,
-#     filter_code STRING,
-#     region STRING,
-#     resolution STRING,
-#     request_timestamp STRING,
-#     _rescued_data STRING,
-#     ingest_time TIMESTAMP
-#     )
-#     """
-# )
+    """
+)
 
 # COMMAND ----------
 
@@ -64,7 +54,7 @@ stream = spark.readStream.format("cloudFiles").option("cloudFiles.format", "json
 
 # COMMAND ----------
 
-stream = spark.read.schema(schema).json(global_production_reservoir)
+# stream = spark.read.schema(schema).json(global_production_reservoir)
 
 # COMMAND ----------
 

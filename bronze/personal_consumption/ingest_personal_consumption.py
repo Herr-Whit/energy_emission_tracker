@@ -17,16 +17,6 @@ checkpoint_location = "dbfs:/checkpoints/dev_bronze_pc/"
 
 # COMMAND ----------
 
-if True:
-    spark.sql(
-    f"""
-    DROP TABLE {table}
-    """
-    )
-    dbutils.fs.rm(checkpoint_location, True)
-
-# COMMAND ----------
-
 spark.sql(
     f"""
     CREATE TABLE IF NOT EXISTS {table} (
@@ -44,14 +34,6 @@ schema = T.StructType([
 
 # COMMAND ----------
 
-dbutils.fs.ls(personal_consumption_reservoir)
-
-# COMMAND ----------
-
-# dbutils.fs.head('/reservoir/personal_consumption/pc_tibber_2024-07-11 14:42:44.529871.json')
-
-# COMMAND ----------
-
 stream = spark.readStream.format("cloudFiles").option("cloudFiles.format", "json").schema(schema).load(personal_consumption_reservoir)
 
 # COMMAND ----------
@@ -65,4 +47,4 @@ query = (stream.writeStream
          .option("checkpointLocation", checkpoint_location)
          .toTable(table))
 
-query.awaitTermination()
+query.start()

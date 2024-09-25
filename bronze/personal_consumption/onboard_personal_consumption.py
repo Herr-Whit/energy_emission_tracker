@@ -19,12 +19,6 @@ token = dbutils.secrets.get('defvault', 'tibber-token')
 
 # COMMAND ----------
 
-if True:
-    dbutils.fs.rm(personal_consumption_reservoir, True)
-    dbutils.fs.mkdirs(personal_consumption_reservoir)
-
-# COMMAND ----------
-
 client = TibberClient(token)
 
 # COMMAND ----------

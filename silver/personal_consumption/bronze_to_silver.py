@@ -13,8 +13,9 @@ silver_table = 'unity.silver.personal_consumption'
 
 # COMMAND ----------
 
-if False:
-    spark.sql(f"DROP TABLE {silver_table}")
+spark.sql(f"""
+          CREATE TABLE IF NOT EXISTS {silver_table}
+          """)
 
 # COMMAND ----------
 
@@ -67,6 +68,7 @@ df = df.withColumn('year', F.year(F.col('from')))
 def write_to_silver(df, batch_id):
     if ~df.isEmpty():
         try:
+            display(df)
             df = df.withColumn('batch_id', F.lit(batch_id))
             dt = DeltaTable.forName(spark, silver_table)
             dt.merge(df, F.expr("dt.from == df.from and dt.to == df.to")).whenNotMatchedInsert()
@@ -75,11 +77,7 @@ def write_to_silver(df, batch_id):
 
 # COMMAND ----------
 
-df.writeStream.outputMode('append').foreachBatch(write_to_silver).start()
-
-# COMMAND ----------
-
-spark.read.table(silver_table)
+df.writeStream.foreachBatch(write_to_silver).start()
 
 # COMMAND ----------
 
