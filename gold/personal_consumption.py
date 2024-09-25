@@ -11,7 +11,7 @@ gold_personal_consumption = 'unity.gold.personal_consumption'
 
 spark.sql(
     f"""
-    CREATE OR REPLACE VIEW {gold_personal_consumption_month} AS SELECT month, sum(cost) as cost, sum(consumption) as consumption FROM {silver_personal_consumption_table} GROUP BY month
+    CREATE OR REPLACE VIEW {gold_personal_consumption_month} AS SELECT month, round(sum(cost), 2) as cost, round(sum(consumption), 2) as consumption FROM {silver_personal_consumption_table} GROUP BY month
     """
 )
 
