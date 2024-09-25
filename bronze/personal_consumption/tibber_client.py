@@ -6,7 +6,7 @@ import requests
 class TibberClient:
     TIBBER_API_URL = "https://api.tibber.com/v1-beta/gql"
 
-    def __init__(self, token):
+    def __init__(self, token, debug=False):
         # Select your transport with a defined url endpoint
         url = 'https://api.tibber.com/v1-beta/gql'
 
@@ -15,38 +15,38 @@ class TibberClient:
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token  # if authentication is required
         }
+        self.debug = debug
 
-    def fetch_from_api(self):
+    def fetch_from_api(self, first=100, after=None, before=None):
         
-        # Define the GraphQL query or mutation
-        query = """
-             {
-                viewer {
-                    homes {
+        # Define the GraphQL query
+        payload = {
+            'query': f"""
+             {{
+                viewer {{
+                    homes {{
                     id
-                    consumption(resolution: HOURLY, first: 100, after: null, before: null) {
-                        nodes {
+                    consumption(resolution: HOURLY, first: {first}, after: {after if after else 'null'}, before: {before if before else 'null'}) {{
+                        nodes {{
                         from
                         to
                         consumption
                         consumptionUnit
                         cost
                         currency
-                        }
-                        pageInfo {
+                        }}
+                        pageInfo {{
                         endCursor
                         hasNextPage
-                        }
-                    }
-                    }
-                }
-            }
-        """
-
-        # Define the payload
-        payload = {
-            'query': query
+                        }}
+                    }}
+                    }}
+                }}
+            }}
+            """
         }
+        if self.debug:
+            print(payload['query'])
 
         # Send the request
         response = requests.post(self.TIBBER_API_URL, headers=self.headers, json=payload)
@@ -57,5 +57,4 @@ class TibberClient:
             return data
         else:
             print(f"Request failed with status code {response.status_code}")
-            print(response.text)
-            raise ValueError()
+            raise ValueError(response.text)

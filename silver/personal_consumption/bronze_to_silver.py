@@ -13,12 +13,6 @@ silver_table = 'unity.silver.personal_consumption'
 
 # COMMAND ----------
 
-spark.sql(f"""
-          CREATE TABLE IF NOT EXISTS {silver_table}
-          """)
-
-# COMMAND ----------
-
 inner_schema = T.StructType([
     T.StructField("from", T.TimestampType(), True),
     T.StructField("to", T.TimestampType(), True),
@@ -40,9 +34,31 @@ df = spark.readStream.table(bronze_table)
 
 # COMMAND ----------
 
+# df = spark.read.table(bronze_table)
+# # 
+
+# COMMAND ----------
+
+# df_static = (spark.read.table(bronze_table))
+# display(df_static.select('ingest_time').distinct( ))
+# from delta import DeltaTable
+# dt = DeltaTable.forName(spark, bronze_table)
+# display(dt.detail())
+# display(dt.history())
+
+# COMMAND ----------
+
+# display(df)
+
+# COMMAND ----------
+
 df = df.withColumn('consumption', F.from_json(F.col('consumption'), schema))
 df = df.withColumn('nodes', F.explode(F.col('consumption.nodes')))
 
+
+# COMMAND ----------
+
+# display(df)
 
 # COMMAND ----------
 
@@ -59,25 +75,44 @@ df = (
 
 # COMMAND ----------
 
+# display(df)
+
+# COMMAND ----------
+
 df = df.withColumn('day', F.dayofmonth(F.col('from')))
 df = df.withColumn('month', F.month(F.col('from')))
 df = df.withColumn('year', F.year(F.col('from')))
 
 # COMMAND ----------
 
-def write_to_silver(df, batch_id):
-    if ~df.isEmpty():
-        try:
-            display(df)
-            df = df.withColumn('batch_id', F.lit(batch_id))
-            dt = DeltaTable.forName(spark, silver_table)
-            dt.merge(df, F.expr("dt.from == df.from and dt.to == df.to")).whenNotMatchedInsert()
-        except pyspark.sql.utils.AnalysisException:
-            df.write.saveAsTable(silver_table)
+# display(df)
 
 # COMMAND ----------
 
-df.writeStream.foreachBatch(write_to_silver).start()
+def write_to_silver(df, batch_id):
+    print(f"Writing to silver table...")
+    if ~df.isEmpty():
+        try:
+            df = df.withColumn('batch_id', F.lit(batch_id))
+            dt = DeltaTable.forName(spark, silver_table)
+            dt.merge(df, F.expr("dt.from == df.from and dt.to == df.to")).whenNotMatchedInsertAll()
+        except pyspark.sql.utils.AnalysisException:
+            print("Table may not exist. Trying to create table...")
+            df.write.saveAsTable(silver_table)
+    else:
+        print("No data to write")
+
+# COMMAND ----------
+
+# write_to_silver(df, -1)
+
+# COMMAND ----------
+
+# display(df)
+
+# COMMAND ----------
+
+df.writeStream.option("checkpointLocation", "/checkpoints/silver/pc_to_silver").outputMode('append').toTable(silver_table).start()#foreachBatch(write_to_silver).trigger(processingTime='10 seconds').start()
 
 # COMMAND ----------
 
