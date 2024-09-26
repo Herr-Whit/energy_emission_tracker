@@ -28,12 +28,12 @@ class GridInfoClient:
             print(response.text)
             raise ValueError()
     
-    def get_indices(self, filter, region, resolution):
-        endpoint = f"/chart_data/{filter}/{region}/index_{resolution}.json"
+    def get_indices(self, fltr, region, resolution):
+        endpoint = f"/chart_data/{fltr}/{region}/index_{resolution}.json"
         return self._fetch_from_api(endpoint)
     
 
-    def get_data(self, filter, region, resolution, timestamp):
-        endpoint = f"/chart_data/{filter}/{region}/{filter}_{region}_{resolution}_{timestamp}.json"
+    def get_data(self, fltr, region, resolution, timestamp):
+        endpoint = f"/chart_data/{fltr}/{region}/{fltr}_{region}_{resolution}_{timestamp}.json"
         return self._fetch_from_api(endpoint)
         
