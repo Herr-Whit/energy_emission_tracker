@@ -1,4 +1,10 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC # Ingest Personal Consumption Data
+# MAGIC Stream the requested json files to bronze
+
+# COMMAND ----------
+
 import pyspark
 import pyspark.sql.functions as F
 import pyspark.sql.types as T

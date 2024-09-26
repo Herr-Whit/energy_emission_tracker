@@ -1,4 +1,12 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC # Process Personal Consumption Data to Silver
+# MAGIC - Unpack the json-encoded consumption data into individual columns
+# MAGIC - Add year/month/date columns
+# MAGIC - Insert unmatched timeframes to silver  
+
+# COMMAND ----------
+
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
 import pyspark
