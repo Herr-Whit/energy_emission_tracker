@@ -3,9 +3,9 @@ import pyspark.sql.functions as F
 
 # COMMAND ----------
 
-silver_general_production_table = "unity.silver.general_production"
-gold_general_production_month = "unity.gold.general_production_monthly"
-gold_general_production = "unity.gold.general_production"
+silver_general_production_table = 'unity.silver.general_production'
+gold_general_production_month = 'unity.gold.general_production_monthly'
+gold_general_production = 'unity.gold.general_production'
 
 # COMMAND ----------
 
@@ -33,11 +33,13 @@ spark.sql(
 
 # COMMAND ----------
 
-df = spark.read.table(gold_general_production)
+df= (spark.read.table(gold_general_production))
 display(df)
 
 # COMMAND ----------
 
-display(df.groupBy("month").agg({"consumption": "sum", "cost": "sum"}))
+display(df.groupBy('month').agg({'consumption': 'sum', 'cost': 'sum'}))
 
 # COMMAND ----------
+
+
