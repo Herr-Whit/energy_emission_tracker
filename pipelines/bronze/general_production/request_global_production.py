@@ -71,6 +71,11 @@
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC This nb syncs up the locally available data with the set of requestable data. The operation will take several hundreds to hundred thousand requests.
+
+# COMMAND ----------
+
 from grid_info import GridInfoClient
 import json
 import datetime
@@ -93,7 +98,11 @@ timestamp = dbutils.widgets.get("timestamp")
 dbutils.widgets.dropdown('stage', 'dev', ['dev', 'int', 'prod'])
 stage = dbutils.widgets.get("stage")
 
-limit = -130
+if stage == 'dev':
+    limit = -130
+else:
+    limit = 0
+
 
 # COMMAND ----------
 
