@@ -53,18 +53,6 @@ ingest_time_match = """table.ingest_time < data.ingest_time"""
 
 # COMMAND ----------
 
-if process_mode == 'batch':
-    existing_df = spark.read.table(silver_table)
-    joind = existing_df.alias('table').join(df.alias('data'), )
-    display(df)
-    print(f"{existing_df.count()=}")
-    print(f"{existing_df.dropDuplicates(['filter_code', 'region', 'resolution', 'timestamp']).count()=}")
-    print(f"{df.count()=}")
-    print(f"{joind.count()=}")
-    display(joind)
-
-# COMMAND ----------
-
 def write_to_silver(df, batch_id):
     print(f"Writing to silver table...")
     if ~df.isEmpty():

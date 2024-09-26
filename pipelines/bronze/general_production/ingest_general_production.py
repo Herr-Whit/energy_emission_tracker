@@ -3,9 +3,6 @@ import pyspark
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
 
-
-
-
 import json
 import time
 import datetime
@@ -29,15 +26,7 @@ schema = T.StructType([
 
 # COMMAND ----------
 
-dbutils.fs.ls(global_production_reservoir)
-
-# COMMAND ----------
-
 stream = spark.readStream.format("cloudFiles").option("cloudFiles.format", "json").schema(schema).load(global_production_reservoir)
-
-# COMMAND ----------
-
-# stream = spark.read.schema(schema).json(global_production_reservoir)
 
 # COMMAND ----------
 
@@ -52,19 +41,6 @@ stream = (
     .withColumn('request_timestamp', F.split(F.col('file_name'), '_')[3])
     .drop('file_name')
     )
-
-# COMMAND ----------
-
-# display(stream)
-
-# COMMAND ----------
-
-# query = (stream.write
-#          .mode('append')
-#         #  .option("checkpointLocation", checkpoint_location)
-#          .saveAsTable(table))
-
-# query.awaitTermination()
 
 # COMMAND ----------
 
