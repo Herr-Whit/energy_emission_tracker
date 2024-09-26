@@ -72,6 +72,8 @@
 # COMMAND ----------
 
 from grid_info import GridInfoClient
+import json
+
 
 # COMMAND ----------
 
@@ -116,39 +118,21 @@ client = GridInfoClient()
 
 # COMMAND ----------
 
-fltr = list(filters.keys())[0]
-fltr
+filters = list(filters.keys())
+for fltr in filters:
+    print(f'retrieving data for {fltr}')
+    indices = client.get_indices(fltr, region, resolution)
+    for i, index in enumerate(indices):
+        # print every 10th index
+        if i % 10 == 0:
+            print(f'processing {i} of {len(indices)} {(fltr, region, resolution, index)=}')
+        data = client.get_data(fltr, region, resolution, index)
+        json_payload = json.dumps(data)
+        file_name = f"{fltr}_{region}_{resolution}_{timestamp}_.json"
+        file_path = reservoir_path + file_name
+        print(file_path)
+        dbutils.fs.put(file_path, json_payload, True)
 
-# COMMAND ----------
-
-indices = client.get_indices(fltr, region, resolution)
-
-# COMMAND ----------
-
-import datetime
-timestamps = indices['timestamps']
-print(','.join([str(x) for x in timestamps]))
-# print epoch timestamps as utc
-
-print(','.join([datetime.datetime.utcfromtimestamp(int(t / 1000)).isoformat() for t in timestamps]))
-
-# COMMAND ----------
-
-timestamps
-
-# COMMAND ----------
-
-data = client.get_data(fltr, region, resolution, timestamps[2])
-data
-
-# COMMAND ----------
-
-import json
-json_payload = json.dumps(data)
-file_name = f"{fltr}_{region}_{resolution}_{timestamp}_.json"
-file_path = reservoir_path + file_name
-print(file_path)
-dbutils.fs.put(file_path, json_payload, True)
 
 # COMMAND ----------
 
