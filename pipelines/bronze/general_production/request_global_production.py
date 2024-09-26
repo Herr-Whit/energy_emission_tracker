@@ -133,7 +133,7 @@ for fltr in filters:
     if stage == 'dev':
         indices = indices[-100:]
     for i, index in enumerate(indices):
-        file_name = f"{fltr}_{region}_{resolution}_{datetime.datetime.utcfromtimestamp(int(index / 1000)).isoformat()}_{datetime.datetime.now().isoformat()}.json"
+        file_name = f"{fltr}_{region}_{resolution}_{datetime.datetime.utcfromtimestamp(int(index / 1000)).isoformat()}_.json"
         file_path = reservoir_path + file_name
         if file_name in existing_file_names:
             print(f"skipping {file_name} as it already exists")
