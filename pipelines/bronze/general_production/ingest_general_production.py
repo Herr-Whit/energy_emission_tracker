@@ -21,20 +21,20 @@ schema_location = "dbfs:/checkpoints/schema_location/"
 
 # COMMAND ----------
 
-spark.sql(
-    f"""
-    CREATE TABLE IF NOT EXISTS {table} (
-    meta_data STRING,
-    series VAR,
-    filter_code STRING,
-    region STRING,
-    resolution STRING,
-    request_timestamp STRING,
-    _rescued_data STRING,
-    ingest_time TIMESTAMP
-    )
-    """
-)
+# spark.sql(
+#     f"""
+#     CREATE TABLE IF NOT EXISTS {table} (
+#     meta_data STRING,
+#     series VAR,
+#     filter_code STRING,
+#     region STRING,
+#     resolution STRING,
+#     request_timestamp STRING,
+#     _rescued_data STRING,
+#     ingest_time TIMESTAMP
+#     )
+#     """
+# )
 
 # COMMAND ----------
 
@@ -60,27 +60,26 @@ stream = spark.readStream.format("cloudFiles").option("cloudFiles.format", "json
 
 stream = (
     stream
-    .withColumn('ingest_time', F.lit(datetime.datetime.now()))
+    .withColumn('ingest_time', F.current_timestamp())
     .withColumn('file_name', F.input_file_name())
     .withColumn('file_name', F.split(F.col('file_name'), '/')[3])
     .withColumn('filter_code', F.split(F.col('file_name'), '_')[0])
     .withColumn('region', F.split(F.col('file_name'), '_')[1])
     .withColumn('resolution', F.split(F.col('file_name'), '_')[2])
     .withColumn('request_timestamp', F.split(F.col('file_name'), '_')[3])
-    # .withColumn('request_timestamp', F.col('request_timestamp').cast(T.IntegerType()))
     .drop('file_name')
     )
 
 # COMMAND ----------
 
-display(stream)
+# display(stream)
 
 # COMMAND ----------
 
-query = (stream.write
-         .mode('append')
-        #  .option("checkpointLocation", checkpoint_location)
-         .saveAsTable(table))
+# query = (stream.write
+#          .mode('append')
+#         #  .option("checkpointLocation", checkpoint_location)
+#          .saveAsTable(table))
 
 # query.awaitTermination()
 
