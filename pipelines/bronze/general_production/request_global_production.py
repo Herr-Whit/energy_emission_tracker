@@ -72,7 +72,7 @@
 # COMMAND ----------
 
 # Define filter region resolution and timestamp as widgets
-dbutils.widgets.text('filter', '')
+dbutils.widgets.text("filter", "")
 filter_val = dbutils.widgets.get("filter")
 
 dbutils.widgets.text("region", "DE")
@@ -91,7 +91,7 @@ from grid_info import GridInfoClient
 
 # COMMAND ----------
 
-reservoir_path = '/reservoir/general_production/'
+reservoir_path = "/reservoir/general_production/"
 
 # COMMAND ----------
 
@@ -105,18 +105,18 @@ dbutils.fs.mkdirs(reservoir_path)
 # COMMAND ----------
 
 filters = {
-    '1223': 'Stromerzeugung: Braunkohle',
-    '1224': 'Stromerzeugung: Kernenergie',
-    '1225': 'Stromerzeugung: Wind Offshore',
-    '1226': 'Stromerzeugung: Wasserkraft',
-    '1227': 'Stromerzeugung: Sonstige Konventionelle',
-    '1228': 'Stromerzeugung: Sonstige Erneuerbare',
-    '4066': 'Stromerzeugung: Biomasse',
-    '4067': 'Stromerzeugung: Wind Onshore',
-    '4068': 'Stromerzeugung: Photovoltaik',
-    '4069': 'Stromerzeugung: Steinkohle',
-    '4070': 'Stromerzeugung: Pumpspeicher',
-    '4071': 'Stromerzeugung: Erdgas'
+    "1223": "Stromerzeugung: Braunkohle",
+    "1224": "Stromerzeugung: Kernenergie",
+    "1225": "Stromerzeugung: Wind Offshore",
+    "1226": "Stromerzeugung: Wasserkraft",
+    "1227": "Stromerzeugung: Sonstige Konventionelle",
+    "1228": "Stromerzeugung: Sonstige Erneuerbare",
+    "4066": "Stromerzeugung: Biomasse",
+    "4067": "Stromerzeugung: Wind Onshore",
+    "4068": "Stromerzeugung: Photovoltaik",
+    "4069": "Stromerzeugung: Steinkohle",
+    "4070": "Stromerzeugung: Pumpspeicher",
+    "4071": "Stromerzeugung: Erdgas",
 }
 
 # COMMAND ----------
@@ -135,11 +135,19 @@ indices = client.get_indices(fltr, region, resolution)
 # COMMAND ----------
 
 import datetime
-timestamps = indices['timestamps']
-print(','.join([str(x) for x in timestamps]))
+
+timestamps = indices["timestamps"]
+print(",".join([str(x) for x in timestamps]))
 # print epoch timestamps as utc
 
-print(','.join([datetime.datetime.utcfromtimestamp(int(t / 1000)).isoformat() for t in timestamps]))
+print(
+    ",".join(
+        [
+            datetime.datetime.utcfromtimestamp(int(t / 1000)).isoformat()
+            for t in timestamps
+        ]
+    )
+)
 
 # COMMAND ----------
 
@@ -149,6 +157,7 @@ data
 # COMMAND ----------
 
 import json
+
 json_payload = json.dumps(data)
 file_name = f"{fltr}_{region}_{resolution}_{timestamp}_.json"
 file_path = reservoir_path + file_name
@@ -156,5 +165,3 @@ print(file_path)
 dbutils.fs.put(file_path, json_payload, True)
 
 # COMMAND ----------
-
-
