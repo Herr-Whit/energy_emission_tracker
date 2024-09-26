@@ -21,23 +21,6 @@ schema_location = "dbfs:/checkpoints/schema_location/"
 
 # COMMAND ----------
 
-# spark.sql(
-#     f"""
-#     CREATE TABLE IF NOT EXISTS {table} (
-#     meta_data STRING,
-#     series VAR,
-#     filter_code STRING,
-#     region STRING,
-#     resolution STRING,
-#     request_timestamp STRING,
-#     _rescued_data STRING,
-#     ingest_time TIMESTAMP
-#     )
-#     """
-# )
-
-# COMMAND ----------
-
 schema = T.StructType([
     T.StructField("meta_data", T.StringType(), True),
     T.StructField("series", T.ArrayType(T.ArrayType(T.StringType())), True),
@@ -91,10 +74,6 @@ query = (stream.writeStream
          .toTable(table))
 
 query.awaitTermination()
-
-# COMMAND ----------
-
-display(spark.sql(f'SELECT * FROM {table}'))
 
 # COMMAND ----------
 

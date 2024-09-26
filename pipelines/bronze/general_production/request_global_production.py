@@ -93,6 +93,8 @@ timestamp = dbutils.widgets.get("timestamp")
 dbutils.widgets.dropdown('stage', 'dev', ['dev', 'int', 'prod'])
 stage = dbutils.widgets.get("stage")
 
+limit = -130
+
 # COMMAND ----------
 
 reservoir_path = '/reservoir/general_production/'
@@ -131,7 +133,7 @@ for fltr in filters:
     print(f'retrieving data for {fltr}')
     indices = client.get_indices(fltr, region, resolution)['timestamps']
     if stage == 'dev':
-        indices = indices[-100:]
+        indices = indices[limit:]
     for i, index in enumerate(indices):
         file_name = f"{fltr}_{region}_{resolution}_{datetime.datetime.utcfromtimestamp(int(index / 1000)).isoformat()}_.json"
         file_path = reservoir_path + file_name
