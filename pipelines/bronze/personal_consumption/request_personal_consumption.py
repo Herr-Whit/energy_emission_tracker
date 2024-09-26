@@ -20,11 +20,11 @@ num_data_points = 100000
 
 # COMMAND ----------
 
-personal_consumption_reservoir = '/reservoir/personal_consumption'
+personal_consumption_reservoir = "/reservoir/personal_consumption"
 
 # COMMAND ----------
 
-token = dbutils.secrets.get('defvault', 'tibber-token')
+token = dbutils.secrets.get("defvault", "tibber-token")
 
 # COMMAND ----------
 
@@ -33,7 +33,7 @@ client = TibberClient(token)
 # COMMAND ----------
 
 result = client.fetch_from_api(first=num_data_points)
-data = result['data']['viewer']['homes'][0]
+data = result["data"]["viewer"]["homes"][0]
 
 # COMMAND ----------
 
@@ -45,8 +45,8 @@ now = datetime.datetime.now()
 
 # COMMAND ----------
 
-file_name = f'pc_tibber_{now}.json'
-file_path = '/'.join([personal_consumption_reservoir, file_name])
+file_name = f"pc_tibber_{now}.json"
+file_path = "/".join([personal_consumption_reservoir, file_name])
 print(f"{file_path=}")
 
 # COMMAND ----------
@@ -54,5 +54,3 @@ print(f"{file_path=}")
 dbutils.fs.put(file_path, json.dumps(data))
 
 # COMMAND ----------
-
-

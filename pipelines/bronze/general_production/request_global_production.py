@@ -83,22 +83,40 @@ import datetime
 # COMMAND ----------
 
 # Define filter region resolution and timestamp as widgets
-dbutils.widgets.text('filter', '')
+dbutils.widgets.text("filter", "")
 filter_val = dbutils.widgets.get("filter")
 
-dbutils.widgets.dropdown("region", "DE", ["DE", "AT", "LU", "DE-LU", "DE-AT-LU", "50Hertz", "Amprion", "TenneT", "TransNetBW", "APG", "Creos"])
+dbutils.widgets.dropdown(
+    "region",
+    "DE",
+    [
+        "DE",
+        "AT",
+        "LU",
+        "DE-LU",
+        "DE-AT-LU",
+        "50Hertz",
+        "Amprion",
+        "TenneT",
+        "TransNetBW",
+        "APG",
+        "Creos",
+    ],
+)
 region = dbutils.widgets.get("region")
 
-dbutils.widgets.dropdown("resolution", "hour", ['hour', 'quarterhour', 'day', 'week', 'month', 'year'])
+dbutils.widgets.dropdown(
+    "resolution", "hour", ["hour", "quarterhour", "day", "week", "month", "year"]
+)
 resolution = dbutils.widgets.get("resolution")
 
 dbutils.widgets.text("timestamp", "2022-01-01T00:00:00.000Z")
 timestamp = dbutils.widgets.get("timestamp")
 
-dbutils.widgets.dropdown('stage', 'dev', ['dev', 'int', 'prod'])
+dbutils.widgets.dropdown("stage", "dev", ["dev", "int", "prod"])
 stage = dbutils.widgets.get("stage")
 
-if stage == 'dev':
+if stage == "dev":
     limit = -130
 else:
     limit = 0
@@ -106,23 +124,23 @@ else:
 
 # COMMAND ----------
 
-reservoir_path = '/reservoir/general_production/'
+reservoir_path = "/reservoir/general_production/"
 
 # COMMAND ----------
 
 filters = {
-    '1223': 'Stromerzeugung: Braunkohle',
-    '1224': 'Stromerzeugung: Kernenergie',
-    '1225': 'Stromerzeugung: Wind Offshore',
-    '1226': 'Stromerzeugung: Wasserkraft',
-    '1227': 'Stromerzeugung: Sonstige Konventionelle',
-    '1228': 'Stromerzeugung: Sonstige Erneuerbare',
-    '4066': 'Stromerzeugung: Biomasse',
-    '4067': 'Stromerzeugung: Wind Onshore',
-    '4068': 'Stromerzeugung: Photovoltaik',
-    '4069': 'Stromerzeugung: Steinkohle',
-    '4070': 'Stromerzeugung: Pumpspeicher',
-    '4071': 'Stromerzeugung: Erdgas'
+    "1223": "Stromerzeugung: Braunkohle",
+    "1224": "Stromerzeugung: Kernenergie",
+    "1225": "Stromerzeugung: Wind Offshore",
+    "1226": "Stromerzeugung: Wasserkraft",
+    "1227": "Stromerzeugung: Sonstige Konventionelle",
+    "1228": "Stromerzeugung: Sonstige Erneuerbare",
+    "4066": "Stromerzeugung: Biomasse",
+    "4067": "Stromerzeugung: Wind Onshore",
+    "4068": "Stromerzeugung: Photovoltaik",
+    "4069": "Stromerzeugung: Steinkohle",
+    "4070": "Stromerzeugung: Pumpspeicher",
+    "4071": "Stromerzeugung: Erdgas",
 }
 
 # COMMAND ----------
@@ -139,9 +157,9 @@ client = GridInfoClient()
 
 filters = list(filters.keys())
 for fltr in filters:
-    print(f'retrieving data for {fltr}')
-    indices = client.get_indices(fltr, region, resolution)['timestamps']
-    if stage == 'dev':
+    print(f"retrieving data for {fltr}")
+    indices = client.get_indices(fltr, region, resolution)["timestamps"]
+    if stage == "dev":
         indices = indices[limit:]
     for i, index in enumerate(indices):
         file_name = f"{fltr}_{region}_{resolution}_{datetime.datetime.utcfromtimestamp(int(index / 1000)).isoformat()}_.json"
@@ -151,9 +169,10 @@ for fltr in filters:
             continue
         # print every 10th index
         if i % 10 == 0:
-            print(f'processing {i} of {len(indices)} {(fltr, region, resolution, index)=}')
+            print(
+                f"processing {i} of {len(indices)} {(fltr, region, resolution, index)=}"
+            )
             print(f"to {file_name=}")
         data = client.get_data(fltr, region, resolution, index)
         json_payload = json.dumps(data)
         dbutils.fs.put(file_path, json_payload, True)
-

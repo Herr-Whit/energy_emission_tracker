@@ -30,7 +30,10 @@ class ExponentialBackoff:
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Called when an exception is raised in the context block
         if exc_type is not None and self.current_retry < self.max_retries:
-            if exc_type.__name__.startswith('HTTP') and exc_val.response.status_code >= 500:
+            if (
+                exc_type.__name__.startswith("HTTP")
+                and exc_val.response.status_code >= 500
+            ):
                 # Check if the error is a 5xx error
                 self.current_retry += 1
                 wait_time = self.sleep_time * (2 ** (self.current_retry - 1))
@@ -38,7 +41,9 @@ class ExponentialBackoff:
                     # Add a bit of randomness to prevent all retries happening at the same time
                     wait_time += random.uniform(0, 1)
 
-                print(f"Retry {self.current_retry}/{self.max_retries}. Waiting {wait_time:.2f} seconds.")
+                print(
+                    f"Retry {self.current_retry}/{self.max_retries}. Waiting {wait_time:.2f} seconds."
+                )
                 time.sleep(wait_time)
 
                 # Suppress the exception by returning True, so the context block can retry
@@ -55,14 +60,14 @@ class GridInfoClient:
     bnetz_url = "https://www.smard.de/app"
 
     headers = {
-            'Content-Type': 'application/json',
-        }
+        "Content-Type": "application/json",
+    }
 
     def __init__(self):
         pass
 
     def _fetch_from_api(self, endpoint):
-        
+
         endpoint_url = self.bnetz_url + endpoint
 
         with ExponentialBackoff(sleep_time=1, max_retries=5) as backoff:
@@ -80,7 +85,7 @@ class GridInfoClient:
                         continue
                     else:
                         raise  # Re-raise non-5xx errors
-        
+
         # Check for errors
         if response.status_code == 200:
             data = response.json()
@@ -89,12 +94,13 @@ class GridInfoClient:
             print(f"Request failed with status code {response.status_code}")
             print(response.text)
             raise ValueError()
-    
+
     def get_indices(self, fltr, region, resolution):
         endpoint = f"/chart_data/{fltr}/{region}/index_{resolution}.json"
         return self._fetch_from_api(endpoint)
 
     def get_data(self, fltr, region, resolution, timestamp):
-        endpoint = f"/chart_data/{fltr}/{region}/{fltr}_{region}_{resolution}_{timestamp}.json"
+        endpoint = (
+            f"/chart_data/{fltr}/{region}/{fltr}_{region}_{resolution}_{timestamp}.json"
+        )
         return self._fetch_from_api(endpoint)
-        

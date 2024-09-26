@@ -6,5 +6,3 @@ spark.sql(
 )
 
 # COMMAND ----------
-
-
