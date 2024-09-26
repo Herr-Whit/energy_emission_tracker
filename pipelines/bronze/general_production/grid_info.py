@@ -52,7 +52,7 @@ class ExponentialBackoff:
 
 
 class GridInfoClient:
-    bnetz_url = "https://smard.api.proxy.bund.dev/app"
+    bnetz_url = "https://www.smard.de/app/"
 
     headers = {
             'Content-Type': 'application/json',
