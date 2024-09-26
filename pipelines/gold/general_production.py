@@ -15,25 +15,25 @@ display(spark.read.table(silver_general_production_table))
 
 spark.sql(
     f"""
-    CREATE OR REPLACE VIEW {gold_personal_consumption_month} AS SELECT month, sum(cost) as cost, sum(consumption) as production FROM {silver_personal_consumption_table} GROUP BY month
+    CREATE OR REPLACE VIEW {gold_general_production_month} AS SELECT month, sum(cost) as cost, sum(consumption) as production FROM {silver_general_production_table} GROUP BY month
     """
 )
 
 # COMMAND ----------
 
-display(spark.read.table(gold_personal_consumption_month))
+display(spark.read.table(gold_general_production_month))
 
 # COMMAND ----------
 
 spark.sql(
     f"""
-    CREATE OR REPLACE VIEW {gold_personal_consumption} AS SELECT * FROM {silver_personal_consumption_table}
+    CREATE OR REPLACE VIEW {gold_general_production} AS SELECT * FROM {silver_general_production_table}
     """
 )
 
 # COMMAND ----------
 
-df= (spark.read.table(gold_personal_consumption))
+df= (spark.read.table(gold_general_production))
 display(df)
 
 # COMMAND ----------
