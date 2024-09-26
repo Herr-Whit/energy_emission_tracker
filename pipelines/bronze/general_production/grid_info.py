@@ -52,7 +52,7 @@ class ExponentialBackoff:
 
 
 class GridInfoClient:
-    bnetz_url = "https://www.smard.de/app/"
+    bnetz_url = "https://www.smard.de/app"
 
     headers = {
             'Content-Type': 'application/json',
@@ -72,7 +72,6 @@ class GridInfoClient:
                     response = requests.get(endpoint_url, headers=self.headers)
                     response.raise_for_status()  # Raises HTTPError for bad responses (like 5xx errors)
                     # If successful, break out of the retry loop
-                    print("Success!", response.content)
                     break
                 except requests.exceptions.HTTPError as e:
                     if e.response.status_code >= 500:
