@@ -71,14 +71,18 @@
 
 # COMMAND ----------
 
+from grid_info import GridInfoClient
+
+# COMMAND ----------
+
 # Define filter region resolution and timestamp as widgets
 dbutils.widgets.text('filter', '')
 filter_val = dbutils.widgets.get("filter")
 
-dbutils.widgets.text("region", "DE")
+dbutils.widgets.dropdown("region", "DE", ["DE", "AT", "LU", "DE-LU", "DE-AT-LU", "50Hertz", "Amprion", "TenneT", "TransNetBW", "APG", "Creos"])
 region = dbutils.widgets.get("region")
 
-dbutils.widgets.text("resolution", "hourl")
+dbutils.widgets.dropdown("resolution", "hour", ['hour', 'quarterhour', 'day', 'week', 'month', 'year'])
 resolution = dbutils.widgets.get("resolution")
 
 dbutils.widgets.text("timestamp", "2022-01-01T00:00:00.000Z")
@@ -87,20 +91,7 @@ timestamp = dbutils.widgets.get("timestamp")
 
 # COMMAND ----------
 
-from grid_info import GridInfoClient
-
-# COMMAND ----------
-
 reservoir_path = '/reservoir/general_production/'
-
-# COMMAND ----------
-
-if True:
-    dbutils.fs.rm(reservoir_path, True)
-
-# COMMAND ----------
-
-dbutils.fs.mkdirs(reservoir_path)
 
 # COMMAND ----------
 
@@ -140,6 +131,10 @@ print(','.join([str(x) for x in timestamps]))
 # print epoch timestamps as utc
 
 print(','.join([datetime.datetime.utcfromtimestamp(int(t / 1000)).isoformat() for t in timestamps]))
+
+# COMMAND ----------
+
+timestamps
 
 # COMMAND ----------
 
