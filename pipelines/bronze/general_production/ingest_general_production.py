@@ -1,4 +1,9 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC Ingest a versioned record of general production data to bronze
+
+# COMMAND ----------
+
 import pyspark
 import pyspark.sql.functions as F
 import pyspark.sql.types as T

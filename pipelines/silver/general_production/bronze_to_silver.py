@@ -1,4 +1,9 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC Port the latest general production data to silver.
+
+# COMMAND ----------
+
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
 import pyspark
