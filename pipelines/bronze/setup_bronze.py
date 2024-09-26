@@ -1,5 +1,5 @@
 # Databricks notebook source
-to_create = ['/reservoir', '/checkpoints/dev_bronze_pc', '/checkpoints/dev_bronze_gp', '/checkpoints/schema_location/']
+to_create = ['/reservoir', '/reservoir/general_production/', '/checkpoints/dev_bronze_pc', '/checkpoints/dev_bronze_gp', '/checkpoints/schema_location/']
 for location in to_create:
     try:
         dbutils.fs.mkdirs(location)

@@ -71,36 +71,42 @@
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC This nb syncs up the locally available data with the set of requestable data. The operation will take several hundreds to hundred thousand requests.
+
+# COMMAND ----------
+
+from grid_info import GridInfoClient
+import json
+import datetime
+
+# COMMAND ----------
+
 # Define filter region resolution and timestamp as widgets
 dbutils.widgets.text('filter', '')
 filter_val = dbutils.widgets.get("filter")
 
-dbutils.widgets.text("region", "DE")
+dbutils.widgets.dropdown("region", "DE", ["DE", "AT", "LU", "DE-LU", "DE-AT-LU", "50Hertz", "Amprion", "TenneT", "TransNetBW", "APG", "Creos"])
 region = dbutils.widgets.get("region")
 
-dbutils.widgets.text("resolution", "hourl")
+dbutils.widgets.dropdown("resolution", "hour", ['hour', 'quarterhour', 'day', 'week', 'month', 'year'])
 resolution = dbutils.widgets.get("resolution")
 
 dbutils.widgets.text("timestamp", "2022-01-01T00:00:00.000Z")
 timestamp = dbutils.widgets.get("timestamp")
 
+dbutils.widgets.dropdown('stage', 'dev', ['dev', 'int', 'prod'])
+stage = dbutils.widgets.get("stage")
 
-# COMMAND ----------
+if stage == 'dev':
+    limit = -130
+else:
+    limit = 0
 
-from grid_info import GridInfoClient
 
 # COMMAND ----------
 
 reservoir_path = '/reservoir/general_production/'
-
-# COMMAND ----------
-
-if True:
-    dbutils.fs.rm(reservoir_path, True)
-
-# COMMAND ----------
-
-dbutils.fs.mkdirs(reservoir_path)
 
 # COMMAND ----------
 
@@ -121,40 +127,33 @@ filters = {
 
 # COMMAND ----------
 
+existing_files = dbutils.fs.ls(reservoir_path)
+existing_file_names = [file.name for file in existing_files]
+existing_file_names
+
+# COMMAND ----------
+
 client = GridInfoClient()
 
 # COMMAND ----------
 
-fltr = list(filters.keys())[0]
-fltr
-
-# COMMAND ----------
-
-indices = client.get_indices(fltr, region, resolution)
-
-# COMMAND ----------
-
-import datetime
-timestamps = indices['timestamps']
-print(','.join([str(x) for x in timestamps]))
-# print epoch timestamps as utc
-
-print(','.join([datetime.datetime.utcfromtimestamp(int(t / 1000)).isoformat() for t in timestamps]))
-
-# COMMAND ----------
-
-data = client.get_data(fltr, region, resolution, timestamps[2])
-data
-
-# COMMAND ----------
-
-import json
-json_payload = json.dumps(data)
-file_name = f"{fltr}_{region}_{resolution}_{timestamp}_.json"
-file_path = reservoir_path + file_name
-print(file_path)
-dbutils.fs.put(file_path, json_payload, True)
-
-# COMMAND ----------
-
+filters = list(filters.keys())
+for fltr in filters:
+    print(f'retrieving data for {fltr}')
+    indices = client.get_indices(fltr, region, resolution)['timestamps']
+    if stage == 'dev':
+        indices = indices[limit:]
+    for i, index in enumerate(indices):
+        file_name = f"{fltr}_{region}_{resolution}_{datetime.datetime.utcfromtimestamp(int(index / 1000)).isoformat()}_.json"
+        file_path = reservoir_path + file_name
+        if file_name in existing_file_names:
+            print(f"skipping {file_name} as it already exists")
+            continue
+        # print every 10th index
+        if i % 10 == 0:
+            print(f'processing {i} of {len(indices)} {(fltr, region, resolution, index)=}')
+            print(f"to {file_name=}")
+        data = client.get_data(fltr, region, resolution, index)
+        json_payload = json.dumps(data)
+        dbutils.fs.put(file_path, json_payload, True)
 
