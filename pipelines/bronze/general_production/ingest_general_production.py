@@ -12,14 +12,12 @@ import json
 import time
 import datetime
 
-
 # COMMAND ----------
 
 table = "unity.bronze.general_production"
 global_production_reservoir = "/reservoir/general_production"
 checkpoint_location = "dbfs:/checkpoints/dev_bronze_gp/"
 schema_location = "dbfs:/checkpoints/schema_location/"
-
 
 # COMMAND ----------
 
@@ -64,3 +62,5 @@ query = (
 query.awaitTermination()
 
 # COMMAND ----------
+
+

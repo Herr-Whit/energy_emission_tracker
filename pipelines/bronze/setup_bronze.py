@@ -5,6 +5,7 @@ to_create = [
     "/checkpoints/dev_bronze_pc",
     "/checkpoints/dev_bronze_gp",
     "/checkpoints/schema_location/",
+    "/reservoir/emissions_consumption",
 ]
 for location in to_create:
     try:

@@ -2,6 +2,12 @@
 silver_table = "unity.silver.personal_consumption"
 spark.sql(f"DROP TABLE IF EXISTS {silver_table}")
 
+spark.sql(
+    """
+    DROP TABLE IF EXISTS unity.silver.emissions
+    """
+)
+
 # COMMAND ----------
 
 try:

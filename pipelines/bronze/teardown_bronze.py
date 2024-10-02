@@ -10,6 +10,7 @@ spark.sql(
     """
 )
 
+
 # COMMAND ----------
 
 to_remove = [
