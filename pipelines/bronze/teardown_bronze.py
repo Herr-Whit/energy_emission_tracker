@@ -1,11 +1,18 @@
 # Databricks notebook source
-spark.sql("DROP TABLE IF EXISTS unity.bronze.general_production")
-spark.sql("DROP TABLE IF EXISTS unity.bronze.personal_consumption")
-spark.sql("DROP TABLE IF EXISTS unity.bronze.emissions")
+dbutils.widgets.dropdown("mode", "soft", ["soft", "hard"])
+mode = dbutils.widgets.get("mode")
 
 # COMMAND ----------
 
-spark.sql("DROP DATABASE IF EXISTS unity.bronze")
+spark.sql("DROP TABLE IF EXISTS unity.bronze.general_production")
+spark.sql("DROP TABLE IF EXISTS unity.bronze.personal_consumption")
+if mode == "hard":
+  spark.sql("DROP TABLE IF EXISTS unity.bronze.emissions")
+
+# COMMAND ----------
+
+if mode == "hard":
+  spark.sql("DROP DATABASE IF EXISTS unity.bronze")
 
 # COMMAND ----------
 

@@ -13,24 +13,16 @@ import json
 import time
 import datetime
 
+# COMMAND ----------
+
+dbutils.widgets.dropdown("processing_mode", "streaming", ["batch", "streaming"])
+processing_mode = dbutils.widgets.get("processing_mode")
 
 # COMMAND ----------
 
-table = "unity.bronze.personal_consumption"
+bronze_table = "unity.bronze.personal_consumption"
 personal_consumption_reservoir = "/reservoir/personal_consumption"
 checkpoint_location = "dbfs:/checkpoints/dev_bronze_pc/"
-
-
-# COMMAND ----------
-
-spark.sql(
-    f"""
-    CREATE TABLE IF NOT EXISTS {table} (
-    consumption STRING,
-    ingest_time TIMESTAMP
-    )
-    """
-)
 
 # COMMAND ----------
 
@@ -38,12 +30,17 @@ schema = T.StructType([T.StructField("consumption", T.StringType(), True)])
 
 # COMMAND ----------
 
-stream = (
-    spark.readStream.format("cloudFiles")
-    .option("cloudFiles.format", "json")
-    .schema(schema)
-    .load(personal_consumption_reservoir)
-)
+if processing_mode == "streaming":
+    stream = (
+        spark.readStream.format("cloudFiles")
+        .option("cloudFiles.format", "json")
+        .schema(schema)
+        .load(personal_consumption_reservoir)
+    )
+elif processing_mode == "batch":
+    stream = spark.read.json(personal_consumption_reservoir, schema)
+else:
+    raise ValueError("Invalid processing mode")
 
 # COMMAND ----------
 
@@ -51,10 +48,15 @@ stream = stream.withColumn("ingest_time", F.current_timestamp())
 
 # COMMAND ----------
 
-query = (
-    stream.writeStream.outputMode("append")
-    .option("checkpointLocation", checkpoint_location)
-    .toTable(table)
-)
+if processing_mode == "batch":
+    stream.write.outputMode("append").toTable(bronze_table)
+elif processing_mode == "streaming":
+    query = (
+        stream.writeStream.outputMode("append")
+        .option("checkpointLocation", checkpoint_location)
+        .toTable(bronze_table)
+    )
 
-query.start()
+    query.awaitTermination()
+else:
+    raise Exception("Invalid processing mode")

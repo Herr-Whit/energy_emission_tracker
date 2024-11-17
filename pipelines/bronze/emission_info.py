@@ -15,15 +15,7 @@ checkpoint_path = "dbfs:/checkpoints/dev_bronze_emissions/"
 
 # COMMAND ----------
 
-spark.sql(
-    f"""
-    CREATE TABLE IF NOT EXISTS {bronze_table} (
-    powerplant_id STRING,
-    powerplant_name STRING,
-    g_per_kwh DOUBLE
-    )
-    """
-)
+
 
 # COMMAND ----------
 

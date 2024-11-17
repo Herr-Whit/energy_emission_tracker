@@ -14,7 +14,12 @@ import datetime
 
 # COMMAND ----------
 
-table = "unity.bronze.general_production"
+dbutils.widgets.dropdown("processing_mode", "streaming", ["batch", "streaming"])
+processing_mode = dbutils.widgets.get("processing_mode")
+
+# COMMAND ----------
+
+bronze_table = "unity.bronze.general_production"
 global_production_reservoir = "/reservoir/general_production"
 checkpoint_location = "dbfs:/checkpoints/dev_bronze_gp/"
 schema_location = "dbfs:/checkpoints/schema_location/"
@@ -31,12 +36,17 @@ schema = T.StructType(
 
 # COMMAND ----------
 
-stream = (
-    spark.readStream.format("cloudFiles")
-    .option("cloudFiles.format", "json")
-    .schema(schema)
-    .load(global_production_reservoir)
-)
+if processing_mode == "streaming":
+    stream = (
+        spark.readStream.format("cloudFiles")
+        .option("cloudFiles.format", "json")
+        .schema(schema)
+        .load(global_production_reservoir)
+    )
+elif processing_mode == "batch":
+    stream = spark.read.schema(schema).json(global_production_reservoir)
+else:
+    raise ValueError("Invalid processing mode")
 
 # COMMAND ----------
 
@@ -53,14 +63,15 @@ stream = (
 
 # COMMAND ----------
 
-query = (
-    stream.writeStream.outputMode("append")
-    .option("checkpointLocation", checkpoint_location)
-    .toTable(table)
-)
+if processing_mode == "batch":
+    stream.write.outputMode("append").toTable(bronze_table)
+elif processing_mode == "streaming":
+    query = (
+        stream.writeStream.outputMode("append")
+        .option("checkpointLocation", checkpoint_location)
+        .toTable(bronze_table)
+    )
 
-query.awaitTermination()
-
-# COMMAND ----------
-
-
+    query.awaitTermination()
+else:
+    raise Exception("Invalid processing mode")
