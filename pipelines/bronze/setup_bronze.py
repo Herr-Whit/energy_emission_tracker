@@ -36,7 +36,7 @@ spark.sql(
   """
   CREATE TABLE IF NOT EXISTS unity.bronze.general_production (
   meta_data string,
-  items ARRAY<STRING>,
+  series ARRAY<ARRAY<STRING>>,
   _rescued_data string,
   ingest_time timestamp,
   filter_code string,
