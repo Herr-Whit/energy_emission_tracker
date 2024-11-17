@@ -1,8 +1,6 @@
 # Databricks notebook source
 spark.sql(
     """
-    CREATE DATABASE unity.gold
+    CREATE DATABASE IF NOT EXISTS unity.gold
     """
 )
-
-# COMMAND ----------

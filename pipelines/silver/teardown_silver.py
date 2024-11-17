@@ -1,12 +1,11 @@
 # Databricks notebook source
-silver_table = "unity.silver.personal_consumption"
-spark.sql(f"DROP TABLE IF EXISTS {silver_table}")
+spark.sql(f"DROP TABLE IF EXISTS unity.silver.personal_consumption")
+spark.sql(f"DROP TABLE IF EXISTS unity.silver.general_production")
+spark.sql("DROP TABLE IF EXISTS unity.silver.emissions")
 
-spark.sql(
-    """
-    DROP TABLE IF EXISTS unity.silver.emissions
-    """
-)
+# COMMAND ----------
+
+spark.sql("DROP DATABASE IF EXISTS unity.silver")
 
 # COMMAND ----------
 
