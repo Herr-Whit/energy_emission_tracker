@@ -15,10 +15,6 @@ checkpoint_path = "dbfs:/checkpoints/dev_bronze_emissions/"
 
 # COMMAND ----------
 
-
-
-# COMMAND ----------
-
 spark.sql(
     f"""
     CREATE TABLE IF NOT EXISTS {silver_table} (
