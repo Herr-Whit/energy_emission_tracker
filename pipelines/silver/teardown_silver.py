@@ -11,5 +11,6 @@ spark.sql("DROP DATABASE IF EXISTS unity.silver")
 
 try:
     dbutils.fs.rm("/checkpoints/silver/pc_to_silver", True)
+    dbutils.fs.rm("/checkpoints/silver/gp_to_silver", True)
 except:
     print("checkpoint not found")
