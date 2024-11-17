@@ -15,12 +15,6 @@ checkpoint_path = "dbfs:/checkpoints/dev_bronze_emissions/"
 
 # COMMAND ----------
 
-# dbutils.fs.rm(checkpoint_path, True)
-# spark.sql(f"DROP TABLE IF EXISTS {bronze_table}")
-# spark.sql(f"DROP TABLE IF EXISTS {silver_table}")
-
-# COMMAND ----------
-
 spark.sql(
     f"""
     CREATE TABLE IF NOT EXISTS {bronze_table} (

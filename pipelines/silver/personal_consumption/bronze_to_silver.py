@@ -16,6 +16,11 @@ from delta import DeltaTable
 
 # COMMAND ----------
 
+dbutils.widgets.dropdown("process_mode", "streaming", ["streaming", "batch"])
+process_mode = dbutils.widgets.get("process_mode")
+
+# COMMAND ----------
+
 bronze_table = "unity.bronze.personal_consumption"
 silver_table = "unity.silver.personal_consumption"
 
@@ -37,9 +42,12 @@ schema = T.StructType([T.StructField("nodes", T.ArrayType(inner_schema), True)])
 
 # COMMAND ----------
 
-df = spark.readStream.table(bronze_table)
-# df = spark.read.table(bronze_table)
-
+if process_mode == "streaming":
+    df = spark.readStream.table(bronze_table)
+elif process_mode == "batch":
+    df = spark.table(bronze_table)
+else:
+    raise ValueError("Invalid process mode")
 
 # COMMAND ----------
 
@@ -86,9 +94,13 @@ def write_to_silver(df, batch_id):
 
 # COMMAND ----------
 
-# df.writeStream.option("checkpointLocation", "/checkpoints/silver/pc_to_silver").outputMode('append').toTable(silver_table).start()#foreachBatch(write_to_silver).trigger(processingTime='10 seconds').start()
-df.writeStream.option(
+if process_mode == "streaming":
+    print("Starting streaming job...")
+    df.writeStream.option(
     "checkpointLocation", "/checkpoints/silver/pc_to_silver"
 ).foreachBatch(write_to_silver).trigger(processingTime="10 seconds").start()
-
-# COMMAND ----------
+elif process_mode == "batch":
+    print("Starting batch job...")
+    write_to_silver(df, -1)
+else:
+    raise ValueError("Invalid process mode")
