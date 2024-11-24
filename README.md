@@ -27,7 +27,8 @@ The following datasets are saved as Delta Tables within the unity catalog.
 Bronze reflects efficient, append-only representations of the API responses.
 ### Silver
 Silver unpacks the responses and selects the relevant subset of the payloads stored in bronze. Type matching is enforced
-and convenience attributes like parsed dates (`year`, `month`, `day`) are added.
+and convenience attributes like parsed dates (`year`, `month`, `day`) are added. The emissions table is created and 
+updated manually as needed.
 ### Gold
 The Silver data is integrated, separated and/or aggregated into _Views_ here.
 - Aggregations:
