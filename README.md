@@ -29,7 +29,7 @@ Bronze reflects efficient, append-only representations of the API responses.
 Silver unpacks the responses and selects the relevant subset of the payloads stored in bronze. Type matching is enforced
 and convenience attributes like parsed dates (`year`, `month`, `day`) are added.
 ### Gold
-The Silver data is integrated. separated and/or aggregated here.
+The Silver data is integrated, separated and/or aggregated into _Views_ here.
 - Aggregations:
   - consumption or production per month, year
 - Separations:
@@ -43,3 +43,12 @@ The Silver data is integrated. separated and/or aggregated here.
     - merit order
     - worst emitter
     - locality, taking into account redispatch measures
+
+One can add access, obfuscation or aggregation clauses to provide fine-grained access control to different consumers.
+
+# Execution
+- [Reset All Tables, Stream checkpoints and Files](pipelines/reset_all.py)
+  - downstream notebooks can reset parts or just setup or tear down
+- Execute all `request` notebooks to activate the API clients
+- Execute all `ingest`, `silver` notebooks to activate the stream processors
+- Execute all `gold` notebooks to declar the gold views
