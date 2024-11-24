@@ -64,7 +64,7 @@ stream = (
 # COMMAND ----------
 
 if processing_mode == "batch":
-    stream.write.outputMode("append").toTable(bronze_table)
+    stream.write.mode("append").saveAsTable(bronze_table)
 elif processing_mode == "streaming":
     query = (
         stream.writeStream.outputMode("append")
@@ -75,3 +75,7 @@ elif processing_mode == "streaming":
     query.awaitTermination()
 else:
     raise Exception("Invalid processing mode")
+
+# COMMAND ----------
+
+
