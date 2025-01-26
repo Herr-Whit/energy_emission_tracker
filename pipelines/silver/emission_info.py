@@ -70,7 +70,7 @@ def update_scd_2_emissions(df, batchId):
 if processing_mode == "batch":
     update_scd_2_emissions(df, -1)
 elif processing_mode == "streaming":
-    df.writeStream.format("delta").option("checkpointLocation", checkpoint_path).start(silver_table)
+    df.writeStream.format("delta").option("checkpointLocation", checkpoint_path).foreachBatch(update_scd_2_emissions).trigger(processingTime="10 seconds").start()
 else:
     raise Exception("Invalid processing mode")
 
