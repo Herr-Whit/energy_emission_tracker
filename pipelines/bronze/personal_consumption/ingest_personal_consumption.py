@@ -49,7 +49,7 @@ stream = stream.withColumn("ingest_time", F.current_timestamp())
 # COMMAND ----------
 
 if processing_mode == "batch":
-    stream.write.outputMode("append").toTable(bronze_table)
+    stream.write.mode("append").saveAsTable(bronze_table)
 elif processing_mode == "streaming":
     query = (
         stream.writeStream.outputMode("append")

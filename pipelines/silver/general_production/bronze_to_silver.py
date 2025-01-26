@@ -34,19 +34,21 @@ else:
 
 # COMMAND ----------
 
-df.withColumn("series", F.explode(F.col("series")))
-
-# COMMAND ----------
-
 df = (
     df.withColumn(
         "series",
         F.explode(F.col("series").cast(T.ArrayType(T.ArrayType(T.FloatType())))),
     )
-    .withColumn("timestamp", F.col("series").getItem(0).cast(T.LongType()))
+    .withColumn("timestamp", (F.col("series").getItem(0)/1000).cast(T.TimestampType()))
     .withColumn("production", F.col("series").getItem(1).cast(T.DoubleType()))
 )
 df = df.drop("series")
+
+# COMMAND ----------
+
+df = (df
+        .withColumn('timestamp', ((F.round(F.unix_timestamp(col("timestamp")) / 360) * 360)
+    .cast("timestamp"))))
 
 # COMMAND ----------
 
@@ -94,3 +96,7 @@ elif process_mode == "batch":
     write_to_silver(df, -1)
 else:
     raise ValueError("Invalid process mode")
+
+# COMMAND ----------
+
+
