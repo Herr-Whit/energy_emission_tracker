@@ -75,6 +75,12 @@ df = df.withColumn("year", F.year(F.col("from")))
 
 # COMMAND ----------
 
+df = df.withColumn('time_span_secs', F.col("to").cast('long') - F.col("from").cast('long'))
+df = df.withColumn('power', F.col("consumption") / (F.col("time_span_secs") / 3600)).drop('time_span_secs')
+
+
+# COMMAND ----------
+
 
 def write_to_silver(df, batch_id):
     print(f"Writing to silver table...")
