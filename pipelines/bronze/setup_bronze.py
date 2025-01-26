@@ -2,6 +2,7 @@
 to_create = [
     "/reservoir",
     "/reservoir/general_production/",
+    "/reservoir/personal_consumption/",
     "/checkpoints/dev_bronze_pc",
     "/checkpoints/dev_bronze_gp",
     "/checkpoints/schema_location/",

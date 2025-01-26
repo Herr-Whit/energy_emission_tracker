@@ -17,11 +17,12 @@ if mode == "hard":
 # COMMAND ----------
 
 to_remove = [
-    "/reservoir",
     "/checkpoints/dev_bronze_pc",
     "/checkpoints/dev_bronze_gp",
     "/checkpoints/schema_location/",
 ]
+if mode == "hard":
+    to_remove.append("/reservoir")
 for location in to_remove:
     try:
         dbutils.fs.rm(location, recurse=True)
