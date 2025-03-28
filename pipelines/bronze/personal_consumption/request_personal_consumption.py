@@ -15,7 +15,7 @@ import datetime
 
 from tibber_client import TibberClient
 
-num_data_points = 100000
+num_data_points = 1000000
 
 
 # COMMAND ----------
@@ -28,29 +28,46 @@ token = dbutils.secrets.get("defvault", "tibber-token")
 
 # COMMAND ----------
 
-client = TibberClient(token)
+client = TibberClient(token, debug=True)
 
 # COMMAND ----------
 
 result = client.fetch_from_api(first=num_data_points)
 data = result["data"]["viewer"]["homes"][0]
-
-# COMMAND ----------
-
-data
-
-# COMMAND ----------
+num_data_retrieved = len(data['consumption']['nodes'])
+print(f"{num_data_retrieved=}")
 
 now = datetime.datetime.now()
-
-# COMMAND ----------
-
 file_name = f"pc_tibber_{now}.json"
 file_path = "/".join([personal_consumption_reservoir, file_name])
 print(f"{file_path=}")
-
-# COMMAND ----------
-
 dbutils.fs.put(file_path, json.dumps(data))
 
+while result["data"]["viewer"]["homes"][0]["consumption"]["pageInfo"]["hasNextPage"]:
+    print("next page...")
+    nextpage_cursor = result["data"]["viewer"]["homes"][0]["consumption"]["pageInfo"]["endCursor"]
+    print(f"{nextpage_cursor=}")
+    result = client.fetch_from_api(first=num_data_points, after=nextpage_cursor)
+    data = result["data"]["viewer"]["homes"][0]
+    num_data_retrieved += len(result["data"]["viewer"]["homes"][0]["consumption"]["nodes"])
+    print(f"{num_data_retrieved=}")
+    print(f"first date: {result['data']['viewer']['homes'][0]['consumption']['nodes'][0]['from']}")
+
+    now = datetime.datetime.now()
+    file_name = f"pc_tibber_{now}.json"
+    file_path = "/".join([personal_consumption_reservoir, file_name])
+    print(f"{file_path=}")
+    dbutils.fs.put(file_path, json.dumps(data))
+
+
 # COMMAND ----------
+
+
+
+# COMMAND ----------
+
+
+
+# COMMAND ----------
+
+

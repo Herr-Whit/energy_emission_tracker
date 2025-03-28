@@ -26,13 +26,15 @@ class TibberClient:
     def fetch_from_api(self, first=100, after=None, before=None):
 
         # Define the GraphQL query to retieve the consumption data (from a given time OR to a given point in time; and the number of hours to retrieve)
+        after = f'"{after}"' if after else 'null'
+        before = f'"{before}"' if before else 'null'
         payload = {
             "query": f"""
              {{
                 viewer {{
                     homes {{
                     id
-                    consumption(resolution: HOURLY, first: {first}, after: {after if after else 'null'}, before: {before if before else 'null'}) {{
+                    consumption(resolution: HOURLY, first: {first}, after: {after}, before: {before}) {{
                         nodes {{
                         from
                         to
