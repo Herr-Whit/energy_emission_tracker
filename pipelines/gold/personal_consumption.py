@@ -11,7 +11,7 @@ gold_personal_consumption = "unity.gold.personal_consumption"
 
 spark.sql(
     f"""
-    CREATE OR REPLACE VIEW {gold_personal_consumption_month} AS SELECT month, round(sum(cost), 2) as cost, round(sum(consumption), 2) as consumption FROM {silver_personal_consumption_table} GROUP BY month
+    CREATE OR REPLACE VIEW {gold_personal_consumption_month} AS SELECT *, round(total_cost / consumption, 3) as avg_cost FROM (SELECT month, round(sum(cost), 2) as total_cost, round(sum(consumption), 2) as consumption FROM {silver_personal_consumption_table} GROUP BY month)
     """
 )
 
@@ -35,5 +35,3 @@ display(df)
 # COMMAND ----------
 
 display(df.groupBy("month").agg({"consumption": "sum", "cost": "sum"}))
-
-# COMMAND ----------
